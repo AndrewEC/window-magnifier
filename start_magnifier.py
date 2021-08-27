@@ -14,7 +14,6 @@ def start_magnifier(arguments: Arguments):
 
     capture_thread = start_capture_thread(capture_queue, window_info_container, arguments)
     conversion_thread = start_conversion_thread(capture_queue, conversion_queue, window_info_container, arguments)
-
     window_lookup_thread = start_window_lookup_thread(window_info_container, arguments)
 
     def stop_on_exit_requested():
