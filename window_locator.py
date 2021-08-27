@@ -60,15 +60,12 @@ class WindowInfoContainer:
         self._lock = Lock()
 
     def get_window_info(self) -> WindowInfo:
-        self._lock.acquire(True, 0.1)
-        info = self._info
-        self._lock.release()
-        return info
+        with self._lock:
+            return self._info
 
     def set_window_info(self, window_info: WindowInfo):
-        self._lock.acquire(True, 0.1)
-        self._info = window_info
-        self._lock.release()
+        with self._lock:
+            self._info = window_info
 
 
 class WindowLookupThread(Thread):
