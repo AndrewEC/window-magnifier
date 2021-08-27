@@ -4,7 +4,7 @@ from queue import Queue
 
 import mss
 
-from window_locator import WindowInfoContainer
+from window_locator import WindowInfoContainer, WindowInfo
 from arguments import Arguments
 
 
@@ -14,7 +14,7 @@ class CaptureThread(threading.Thread):
         super().__init__()
         self._capture_queue = capture_queue
         self._capture_screen = mss.mss()
-        self._window_info = window_info_container
+        self._window_info_container = window_info_container
         self._running = True
         self._arguments = arguments
 
@@ -22,7 +22,13 @@ class CaptureThread(threading.Thread):
         print('Starting capture thread')
         while self._running:
             try:
-                capture_data = self._capture_screen.grab(self._window_info.get_window_info().as_capture_bounds())
+                window_info = self._window_info_container.get_window_info()
+
+                if window_info == WindowInfo.default_window_info():
+                    self.stop_running()
+                    break
+
+                capture_data = self._capture_screen.grab(window_info.as_capture_bounds())
                 self._capture_queue.put(capture_data, True, timeout=0.1)
             except Exception:
                 pass

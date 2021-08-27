@@ -86,6 +86,7 @@ class WindowLookupThread(Thread):
                 window_info = get_core_window_info(self._arguments)
 
                 if window_info == WindowInfo.default_window_info():
+                    self._window_info_container.set_window_info(window_info)
                     self.stop_running()
                     break
 
