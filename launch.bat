@@ -1,0 +1,1 @@
+start cmd /c "python -m magnifier.start && exit 0"
