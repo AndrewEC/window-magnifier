@@ -6,17 +6,20 @@ import mss
 
 from window_locator import WindowInfoContainer, WindowInfo
 from arguments import Arguments
+from countdown_latch import CountDownLatch
 
 
 class CaptureThread(threading.Thread):
 
-    def __init__(self, capture_queue: Queue, window_info_container: WindowInfoContainer, arguments: Arguments):
+    def __init__(self, capture_queue: Queue, window_info_container: WindowInfoContainer, arguments: Arguments,
+                 latch: CountDownLatch):
         super().__init__()
         self._capture_queue = capture_queue
         self._capture_screen = mss.mss()
         self._window_info_container = window_info_container
         self._running = True
         self._arguments = arguments
+        self._latch = latch
 
     def run(self):
         print('Starting capture thread')
@@ -34,13 +37,15 @@ class CaptureThread(threading.Thread):
                 pass
             time.sleep(self._arguments.capture_delay_interval)
         print('Capture thread stopped.')
+        self._latch.count_down()
 
     def stop_running(self):
         print('Capture thread stop requested.')
         self._running = False
 
 
-def start_capture_thread(capture_queue: Queue, window_info_container: WindowInfoContainer, arguments: Arguments):
-    capture_thread = CaptureThread(capture_queue, window_info_container, arguments)
+def start_capture_thread(capture_queue: Queue, window_info_container: WindowInfoContainer, arguments: Arguments,
+                         latch: CountDownLatch):
+    capture_thread = CaptureThread(capture_queue, window_info_container, arguments, latch)
     capture_thread.start()
     return capture_thread

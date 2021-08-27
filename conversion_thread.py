@@ -8,17 +8,20 @@ import pygame
 
 from arguments import Arguments
 from window_locator import WindowInfoContainer
+from countdown_latch import CountDownLatch
 
 
 class ConversionThread(Thread):
 
-    def __init__(self, capture_queue: Queue, conversion_queue: Queue, window_info_container: WindowInfoContainer, arguments: Arguments):
+    def __init__(self, capture_queue: Queue, conversion_queue: Queue, window_info_container: WindowInfoContainer,
+                 arguments: Arguments, latch: CountDownLatch):
         super().__init__()
         self._running = True
         self._capture_queue = capture_queue
         self._arguments = arguments
         self._window_info = window_info_container
         self._conversion_queue = conversion_queue
+        self._latch = latch
 
     def run(self):
         print('Starting conversion thread')
@@ -31,6 +34,7 @@ class ConversionThread(Thread):
             except Exception:
                 time.sleep(0.01)
         print('Conversion thread stopped')
+        self._latch.count_down()
 
     def _convert_to_pil_image(self, capture_data: ScreenShot) -> Image:
         pil_image = Image.frombytes("RGB", capture_data.size, capture_data.bgra, "raw", "BGRX")
@@ -44,8 +48,9 @@ class ConversionThread(Thread):
         self._running = False
 
 
-def start_conversion_thread(capture_queue: Queue, conversion_queue: Queue, window_info_container: WindowInfoContainer, arguments: Arguments)\
+def start_conversion_thread(capture_queue: Queue, conversion_queue: Queue, window_info_container: WindowInfoContainer,
+                            arguments: Arguments, latch: CountDownLatch)\
         -> ConversionThread:
-    conversion_thread = ConversionThread(capture_queue, conversion_queue, window_info_container, arguments)
+    conversion_thread = ConversionThread(capture_queue, conversion_queue, window_info_container, arguments, latch)
     conversion_thread.start()
     return conversion_thread

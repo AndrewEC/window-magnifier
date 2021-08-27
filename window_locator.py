@@ -1,11 +1,12 @@
 from __future__ import annotations
-from typing import Tuple, Dict, Callable
+from typing import Tuple, Dict
 from threading import Lock, Thread
 import time
 
 import pygetwindow as gw
 
 from arguments import Arguments
+from countdown_latch import CountDownLatch
 
 
 class WindowInfo:
@@ -72,12 +73,13 @@ class WindowInfoContainer:
 
 class WindowLookupThread(Thread):
 
-    def __init__(self, window_info_container: WindowInfoContainer, arguments: Arguments):
+    def __init__(self, window_info_container: WindowInfoContainer, arguments: Arguments, latch: CountDownLatch):
         super().__init__()
         self._running = True
         self._arguments = arguments
         self._window_info_container = window_info_container
         self._window_info = self._window_info_container.get_window_info()
+        self._latch = latch
 
     def run(self):
         print('Starting window lookup thread')
@@ -97,13 +99,15 @@ class WindowLookupThread(Thread):
                 pass
             time.sleep(0.05)
         print('Window lookup thread ended.')
+        self._latch.count_down()
 
     def stop_running(self):
         print('Window lookup thread stop requested.')
         self._running = False
 
 
-def start_window_lookup_thread(window_info_container: WindowInfoContainer, arguments: Arguments) -> WindowLookupThread:
-    window_lookup_thread = WindowLookupThread(window_info_container, arguments)
+def start_window_lookup_thread(window_info_container: WindowInfoContainer, arguments: Arguments,
+                               latch: CountDownLatch) -> WindowLookupThread:
+    window_lookup_thread = WindowLookupThread(window_info_container, arguments, latch)
     window_lookup_thread.start()
     return window_lookup_thread

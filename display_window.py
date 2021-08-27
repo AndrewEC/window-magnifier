@@ -1,6 +1,5 @@
 from typing import Callable
 
-import sys
 from queue import Queue
 
 import pygame
@@ -21,7 +20,6 @@ def start_display_window(conversion_queue: Queue, window_info: WindowInfoContain
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 on_exit()
-                sys.exit(0)
 
         try:
             next_image = conversion_queue.get(True, timeout=0.3)
