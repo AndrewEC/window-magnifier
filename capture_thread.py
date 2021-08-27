@@ -21,12 +21,16 @@ class CaptureThread(threading.Thread):
     def run(self):
         print('Starting capture thread')
         while self._running:
-            capture_data = self._capture_screen.grab(self._window_info.get_window_info().as_capture_bounds())
-            self._capture_queue.put(capture_data, True, timeout=0.1)
-            time.sleep(0.01)
-        print('Stopping capture thread')
+            try:
+                capture_data = self._capture_screen.grab(self._window_info.get_window_info().as_capture_bounds())
+                self._capture_queue.put(capture_data, True, timeout=0.1)
+            except Exception:
+                pass
+            time.sleep(self._arguments.capture_delay_interval)
+        print('Capture thread stopped.')
 
     def stop_running(self):
+        print('Capture thread stop requested.')
         self._running = False
 
 

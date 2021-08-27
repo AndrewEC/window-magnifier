@@ -1,3 +1,4 @@
+import time
 from threading import Thread
 from queue import Queue
 
@@ -28,8 +29,8 @@ class ConversionThread(Thread):
                 surface = self._convert_image_to_surface(image)
                 self._conversion_queue.put(surface)
             except Exception:
-                pass
-        print('Stopping conversion thread')
+                time.sleep(0.01)
+        print('Conversion thread stopped')
 
     def _convert_to_pil_image(self, capture_data: ScreenShot) -> Image:
         pil_image = Image.frombytes("RGB", capture_data.size, capture_data.bgra, "raw", "BGRX")
@@ -39,6 +40,7 @@ class ConversionThread(Thread):
         return pygame.image.fromstring(pil.tobytes(), pil.size, pil.mode).convert()
 
     def stop_running(self):
+        print('Conversion thread stop requested.')
         self._running = False
 
 

@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Tuple, Dict, Any
+from typing import Tuple, Dict, Callable
 from threading import Lock, Thread
 import time
 
@@ -33,16 +33,19 @@ class WindowInfo:
 
 
 def get_core_window_info(arguments: Arguments) -> WindowInfo:
-    window_title = arguments.target_window_title
-    windows = gw.getWindowsWithTitle(window_title)
-    desired_window = next((window for window in windows if window.title == window_title), None)
-    if desired_window is None:
+    try:
+        window_title = arguments.target_window_title
+        windows = gw.getWindowsWithTitle(window_title)
+        desired_window = next((window for window in windows if window.title == window_title), None)
+        if desired_window is None:
+            return WindowInfo.default_window_info()
+
+        position = desired_window.topleft
+        size = desired_window.size
+
+        return WindowInfo(size, position)
+    except Exception:
         return WindowInfo.default_window_info()
-
-    position = desired_window.topleft
-    size = desired_window.size
-
-    return WindowInfo(size, position)
 
 
 def get_starting_window_info(arguments: Arguments) -> WindowInfoContainer:
@@ -56,12 +59,15 @@ class WindowInfoContainer:
         self._lock = Lock()
 
     def get_window_info(self) -> WindowInfo:
-        with self._lock:
-            return self._info
+        self._lock.acquire(True, 0.1)
+        info = self._info
+        self._lock.release()
+        return info
 
     def set_window_info(self, window_info: WindowInfo):
-        with self._lock:
-            self._info = window_info
+        self._lock.acquire(True, 0.1)
+        self._info = window_info
+        self._lock.release()
 
 
 class WindowLookupThread(Thread):
@@ -76,15 +82,23 @@ class WindowLookupThread(Thread):
     def run(self):
         print('Starting window lookup thread')
         while self._running:
-            time.sleep(0.05)
-            window_info = get_core_window_info(self._arguments)
+            try:
+                window_info = get_core_window_info(self._arguments)
 
-            if self._window_info != window_info:
-                self._window_info = window_info
-                self._window_info_container.set_window_info(window_info)
-        print('Stopping window lookup thread')
+                if window_info == WindowInfo.default_window_info():
+                    self.stop_running()
+                    break
+
+                if self._window_info != window_info:
+                    self._window_info = window_info
+                    self._window_info_container.set_window_info(window_info)
+            except Exception:
+                pass
+            time.sleep(0.05)
+        print('Window lookup thread ended.')
 
     def stop_running(self):
+        print('Window lookup thread stop requested.')
         self._running = False
 
 
