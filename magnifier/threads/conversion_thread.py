@@ -1,7 +1,6 @@
 import time
 from queue import Queue
 
-from mss.screenshot import ScreenShot
 from PIL import Image
 import pygame
 

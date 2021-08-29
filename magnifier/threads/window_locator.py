@@ -1,7 +1,7 @@
 from __future__ import annotations
 import time
 
-from magnifier.window import WindowInfo, WindowInfoContainer, get_core_window_info
+from magnifier.win32 import WindowInfo, WindowInfoContainer, get_core_window_info
 from magnifier.util import Arguments
 
 from .countdown_latch import CountDownLatch
@@ -18,11 +18,11 @@ class WindowLookupThread(BaseThread):
 
     def execute(self):
         try:
-            window_info = get_core_window_info(self._arguments)
+            window_info = get_core_window_info(self._arguments.target_window_title)
 
-            if window_info == WindowInfo.default_window_info():
+            if window_info.is_default_info():
                 self._window_info_container.set_window_info(window_info)
-                return self.request_stop()
+                return
 
             if self._window_info != window_info:
                 self._window_info = window_info

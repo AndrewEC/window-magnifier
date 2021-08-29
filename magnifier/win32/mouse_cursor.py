@@ -3,7 +3,7 @@ from typing import Tuple
 import win32gui, win32ui
 from PIL import Image
 
-from magnifier.window import WindowInfo
+from magnifier.win32 import WindowInfo
 
 
 MOUSE_HIDDEN_FLAG = 0
@@ -18,10 +18,10 @@ last_cursor_image = None
 def _get_cursor_image(hcursor) -> Image:
     global last_cursor_image
     try:
-        hdc = win32ui.CreateDCFromHandle(win32gui.GetDC(0))
+        wdc = win32ui.CreateDCFromHandle(win32gui.GetDC(0))
         hbmp = win32ui.CreateBitmap()
-        hbmp.CreateCompatibleBitmap(hdc, 36, 36)
-        hdc = hdc.CreateCompatibleDC()
+        hbmp.CreateCompatibleBitmap(wdc, 36, 36)
+        hdc = wdc.CreateCompatibleDC()
         hdc.SelectObject(hbmp)
         hdc.DrawIcon((0, 0), hcursor)
 
@@ -32,6 +32,7 @@ def _get_cursor_image(hcursor) -> Image:
         win32gui.DestroyIcon(hcursor)
         win32gui.DeleteObject(hbmp.GetHandle())
         hdc.DeleteDC()
+        wdc.DeleteDC()
 
         last_cursor_image = image
         return image

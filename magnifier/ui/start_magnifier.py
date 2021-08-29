@@ -3,12 +3,12 @@ from queue import Queue
 
 from magnifier.util import Arguments, ScaleContainer
 from magnifier.threads import start_conversion_thread, start_capture_thread, start_window_lookup_thread, CountDownLatch
-from magnifier.window import get_starting_window_info
+from magnifier.win32 import get_starting_window_info
 from .display_window import start_display_window
 
 
 def start_magnifier(arguments: Arguments):
-    window_info_container = get_starting_window_info(arguments)
+    window_info_container = get_starting_window_info(arguments.target_window_title)
     capture_queue = Queue()
     conversion_queue = Queue()
     latch = CountDownLatch(3)
@@ -28,4 +28,5 @@ def start_magnifier(arguments: Arguments):
         latch.await_countdown()
         sys.exit(0)
 
-    start_display_window(conversion_queue, window_info_container, scale_container, stop_on_exit_requested)
+    start_display_window(conversion_queue, window_info_container, scale_container, arguments,
+                         stop_on_exit_requested)
