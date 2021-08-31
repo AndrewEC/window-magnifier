@@ -7,9 +7,9 @@ from magnifier.util import Arguments
 from .start_magnifier import start_magnifier
 
 
-def create_select_delay_section(root):
+def _create_select_delay_section(root):
     text = tk.StringVar()
-    text.set('Select capture interval delay (milliseconds) (10):')
+    text.set('Select capture interval delay (milliseconds) (50):')
 
     select_delay_duration_label = ttk.Label(root, textvariable=text)
     select_delay_duration_label.pack(fill='x', padx=5, pady=5)
@@ -17,14 +17,14 @@ def create_select_delay_section(root):
     def on_magnification_changed(new_value):
         text.set(f'Select capture interval delay (milliseconds) ({round(float(new_value), 1)}):')
 
-    delay_level_slider = ttk.Scale(root, from_=1, to=100, orient=tk.HORIZONTAL, command=on_magnification_changed)
-    delay_level_slider.set(10)
+    delay_level_slider = ttk.Scale(root, from_=1, to=1000, orient=tk.HORIZONTAL, command=on_magnification_changed)
+    delay_level_slider.set(50)
     delay_level_slider.pack(fill='x', padx=5, pady=5)
 
     return delay_level_slider
 
 
-def create_select_resampling_filter(root):
+def _create_select_resampling_filter(root):
     select_resampling_filter_label = ttk.Label(root, text='Select a resampling filter (default is BICUBIC):')
     select_resampling_filter_label.pack(fill='x', padx=5, pady=5)
 
@@ -35,7 +35,7 @@ def create_select_resampling_filter(root):
     return resampling_filter_selector
 
 
-def create_select_window_title_section(root):
+def _create_select_window_title_section(root):
     window_titles = []
 
     def add_title(hwnd, extra):
@@ -56,55 +56,55 @@ def create_select_window_title_section(root):
     return window_title_selector
 
 
-def create_capture_cursor_checkbox(root):
+def _create_capture_cursor_checkbox(root):
     control = tk.StringVar(value=0)
     check = ttk.Checkbutton(root, text='Capture mouse cursor when cursor is over target window', variable=control)
     check.pack(fill='x', padx=5, pady=5)
     return control
 
 
-def create_always_on_top(root):
+def _create_always_on_top(root):
     control = tk.StringVar(value=1)
     check = ttk.Checkbutton(root, text='Make magnifier appear on top of other windows', variable=control)
     check.pack(fill='x', padx=5, pady=5)
     return control
 
 
-def create_refocus_to_target(root):
+def _create_refocus_to_target(root):
     control = tk.StringVar(value=1)
     check = ttk.Checkbutton(root, text='Activate target window when magnifier is selected', variable=control)
     check.pack(fill='x', padx=5, pady=5)
     return control
 
 
-def parse_resampling_filter_option(raw_option: str) -> str:
-    raw_option = raw_option.strip()
-    if raw_option == '':
+def _parse_resampling_filter_option(sampler_option: str) -> str:
+    sampler_option = sampler_option.strip()
+    if sampler_option == '':
         return 'BICUBIC'
 
-    if ' ' in raw_option:
-        return raw_option.split(' ')[0].strip()
+    if ' ' in sampler_option:
+        return sampler_option.split(' ')[0].strip()
 
-    return raw_option
+    return sampler_option
 
 
-def present_ui():
+def present_magnifier_options():
     root = tk.Tk()
     root.geometry('450x315')
     root.resizable(False, False)
     root.title('Window Magnifier Options')
 
-    window_title_selector = create_select_window_title_section(root)
-    delay_level_slider = create_select_delay_section(root)
-    sample_selector = create_select_resampling_filter(root)
-    capture_cursor_check = create_capture_cursor_checkbox(root)
-    always_on_top_check = create_always_on_top(root)
-    refocus_to_target_check = create_refocus_to_target(root)
+    window_title_selector = _create_select_window_title_section(root)
+    delay_level_slider = _create_select_delay_section(root)
+    sample_selector = _create_select_resampling_filter(root)
+    capture_cursor_check = _create_capture_cursor_checkbox(root)
+    always_on_top_check = _create_always_on_top(root)
+    refocus_to_target_check = _create_refocus_to_target(root)
 
     def confirm_clicked():
         window_title = window_title_selector.get()
         capture_delay_interval = round(float(delay_level_slider.get()) / 1000.0, 5)
-        resampling_filter = parse_resampling_filter_option(sample_selector.get())
+        resampling_filter = _parse_resampling_filter_option(sample_selector.get())
         capture_cursor = capture_cursor_check.get() == '1'
         always_on_top = always_on_top_check.get() == '1'
         refocus_to_target = refocus_to_target_check.get() == '1'
@@ -123,4 +123,4 @@ def present_ui():
 
 
 if __name__ == '__main__':
-    present_ui()
+    present_magnifier_options()

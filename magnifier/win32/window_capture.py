@@ -4,12 +4,10 @@ import win32gui
 import win32ui
 import win32con
 
-from .window_position import get_core_window_info_by_hwnd
+from .window_info import WindowInfo
 
 
-def capture_image_of_window(hwnd) -> Image:
-    window_info = get_core_window_info_by_hwnd(hwnd)
-
+def capture_image_of_window(hwnd, window_info: WindowInfo) -> Image:
     wDC = win32gui.GetWindowDC(hwnd)
     dcObj = win32ui.CreateDCFromHandle(wDC)
     cDC = dcObj.CreateCompatibleDC()

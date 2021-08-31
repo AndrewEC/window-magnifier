@@ -1,1 +1,1 @@
-from .magnifier import present_ui
+from .magnifier_options import present_magnifier_options

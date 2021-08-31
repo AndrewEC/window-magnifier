@@ -14,13 +14,32 @@ COLOURS_PER_PIXEL = 3
 last_cursor_image = None
 
 
+def _get_cursor_size(hcursor) -> Tuple[int, int]:  # https://stackoverflow.com/a/67265511
+    info = win32gui.GetIconInfo(hcursor)
+
+    if info[4]:  # Icon has color plane.
+        bmp = win32gui.GetObject(info[4])
+
+        width = bmp.bmWidth
+        height = bmp.bmHeight
+    else:  # Icon has no colour plane, image data stored in mask.
+        bmp = win32gui.GetObject(info[3])
+
+        width = bmp.bmWidth
+        height = bmp.bmHeight // 2  # A monochrome icon contains image and XOR mask in the hbmMask.
+
+    return width, height
+
+
 # Modified version of snippet from: https://github.com/BoboTiG/python-mss/issues/55#issuecomment-580481146
 def _get_cursor_image(hcursor) -> Image:
     global last_cursor_image
     try:
+        icon_size = _get_cursor_size(hcursor)
+
         wdc = win32ui.CreateDCFromHandle(win32gui.GetDC(0))
         hbmp = win32ui.CreateBitmap()
-        hbmp.CreateCompatibleBitmap(wdc, 36, 36)
+        hbmp.CreateCompatibleBitmap(wdc, icon_size[0], icon_size[1])
         hdc = wdc.CreateCompatibleDC()
         hdc.SelectObject(hbmp)
         hdc.DrawIcon((0, 0), hcursor)
@@ -36,7 +55,8 @@ def _get_cursor_image(hcursor) -> Image:
 
         last_cursor_image = image
         return image
-    except Exception:
+    except Exception as e:
+        print(str(e))
         return last_cursor_image
 
 
@@ -54,7 +74,7 @@ def _is_mouse_over_target_application(x: int, y: int, window_info: WindowInfo) -
     return _is_position_within_rect((x, y), (position[0], position[1], size[0], size[1]))
 
 
-def _is_within_image_bounds(x: int, y: int, image: Image) -> bool:
+def _is_pixel_within_image_bounds(x: int, y: int, image: Image) -> bool:
     return _is_position_within_rect((x, y), (0, 0, image.size[0], image.size[1]))
 
 
@@ -71,7 +91,7 @@ def _paste_cursor_on_image(cursor_x: int, cursor_y: int, cursor_image: Image, ca
 
             x = source_pixel_x + cursor_x - window_info.position[0]
             y = source_pixel_y + cursor_y - window_info.position[1]
-            if not _is_within_image_bounds(x, y, captured_image):
+            if not _is_pixel_within_image_bounds(x, y, captured_image):
                 continue
             captured_image.putpixel((x, y), (DEFAULT_MOUSE_PIXEL_COLOUR,) * COLOURS_PER_PIXEL)
 

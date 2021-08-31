@@ -1,5 +1,5 @@
-from magnifier.ui import present_ui
+from magnifier.ui import present_magnifier_options
 
 
 if __name__ == '__main__':
-    present_ui()
+    present_magnifier_options()

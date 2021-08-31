@@ -4,55 +4,70 @@ from queue import Queue
 import win32con
 import win32gui
 import pygame
+from pygame.event import Event
 
-from magnifier.threads import WindowInfoContainer
-from magnifier.util import ScaleContainer, calculate_new_scale, MAGNIFIER_DISPLAY_WINDOW_NAME, Arguments
-from magnifier.win32 import get_core_window_info_by_hwnd
+from magnifier.util import ScaleContainer, calculate_new_scale_factor, MAGNIFIER_DISPLAY_WINDOW_NAME, Arguments, invoke_and_suppress, WindowHandleContainer
+from magnifier.win32 import get_window_info_by_handle, get_window_handle
 
 
-def determine_image_rect(image_rect: pygame.Rect):
+def _determine_image_rect(image_rect: pygame.Rect):
     width, height = pygame.display.get_surface().get_size()
     return pygame.Rect(width / 2 - image_rect.width / 2, height / 2 - image_rect.height / 2, image_rect.width, image_rect.height)
 
 
-def start_display_window(conversion_queue: Queue, window_info_container: WindowInfoContainer, scale_container: ScaleContainer,
-                         arguments: Arguments, on_exit: Callable):
+def _set_window_to_be_on_top():
+    hwnd = pygame.display.get_wm_info()['window']
+    position = get_window_info_by_handle(hwnd).position
+    win32gui.SetWindowPos(hwnd, win32con.HWND_TOPMOST, position[0], position[1], 0, 0,
+                          win32con.SWP_NOSIZE | win32con.SWP_NOMOVE)
+
+
+def _update_scale_factor(event: Event, window_handle, scale_container: ScaleContainer):
+    window_info = get_window_info_by_handle(window_handle)
+    if window_info.is_default_info():
+        return
+    size = event.dict['size']
+    new_scale = calculate_new_scale_factor(window_info.size, size)
+    scale_container.set_value(new_scale)
+
+
+def start_display_window(conversion_queue: Queue, window_handle_container: WindowHandleContainer,
+                         scale_container: ScaleContainer, arguments: Arguments, on_exit: Callable):
+    window_handle = window_handle_container.get_value()
+
     pygame.init()
 
-    size = window_info_container.get_window_info().size
+    size = get_window_info_by_handle(window_handle).size
     print(f'Initializing pygame window to [{size}]')
 
     pygame_screen = pygame.display.set_mode(size, pygame.RESIZABLE | pygame.DOUBLEBUF | pygame.HWSURFACE)
     pygame.display.set_caption(MAGNIFIER_DISPLAY_WINDOW_NAME)
 
     if arguments.always_on_top:
-        hwnd = pygame.display.get_wm_info()['window']
-        position = get_core_window_info_by_hwnd(hwnd).position
-        win32gui.SetWindowPos(hwnd, win32con.HWND_TOPMOST, position[0], position[1], 0, 0,
-                              win32con.SWP_NOSIZE | win32con.SWP_NOMOVE)
+        _set_window_to_be_on_top()
 
     while True:
+        if not win32gui.IsWindow(window_handle):
+            window_handle = get_window_handle(arguments.target_window_title)
+            if window_handle is None:
+                pygame.time.delay(500)
+            window_handle_container.set_value(window_handle)
+            invoke_and_suppress(lambda: _update_scale_factor(event, window_handle, scale_container))
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return on_exit()
             elif event.type == pygame.VIDEORESIZE:
-                window_info = window_info_container.get_window_info()
-                if not window_info.is_default_info():
-                    size = event.dict['size']
-                    new_scale = calculate_new_scale(window_info_container.get_window_info().size, size)
-                    scale_container.set_scale(new_scale)
+                invoke_and_suppress(lambda: _update_scale_factor(event, window_handle, scale_container))
             elif event.type == pygame.WINDOWFOCUSGAINED:
-                try:
-                    if arguments.refocus_to_target:
-                        win32gui.SetForegroundWindow(window_info_container.get_window_info().window_handle)
-                except Exception:
-                    pass
+                if arguments.refocus_to_target:
+                    invoke_and_suppress(lambda: win32gui.SetForegroundWindow(window_handle))
 
         try:
             next_image = conversion_queue.get(True, timeout=0.3)
 
             pygame_screen.fill((0, 0, 0))
-            pygame_screen.blit(next_image, determine_image_rect(next_image.get_rect()))
+            pygame_screen.blit(next_image, _determine_image_rect(next_image.get_rect()))
         except Exception:
             pass
 

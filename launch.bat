@@ -1,1 +1,1 @@
-start cmd /c "python -m magnifier.start && exit 0"
+start cmd /c "python -m venv window-magnifier-env && pip install -r requirements.txt && python -m magnifier.start"
