@@ -7,7 +7,7 @@ import pygame
 from pygame.event import Event
 
 from magnifier.util import ScaleContainer, calculate_new_scale_factor, MAGNIFIER_DISPLAY_WINDOW_NAME, Arguments, invoke_and_suppress, WindowHandleContainer
-from magnifier.win32 import get_window_info_by_handle, get_window_handle
+from magnifier.win32 import get_window_info, get_window_handle
 
 
 def _determine_image_rect(image_rect: pygame.Rect):
@@ -17,15 +17,13 @@ def _determine_image_rect(image_rect: pygame.Rect):
 
 def _set_window_to_be_on_top():
     hwnd = pygame.display.get_wm_info()['window']
-    position = get_window_info_by_handle(hwnd).position
+    position = get_window_info(hwnd).position
     win32gui.SetWindowPos(hwnd, win32con.HWND_TOPMOST, position[0], position[1], 0, 0,
                           win32con.SWP_NOSIZE | win32con.SWP_NOMOVE)
 
 
 def _update_scale_factor(event: Event, window_handle, scale_container: ScaleContainer):
-    window_info = get_window_info_by_handle(window_handle)
-    if window_info.is_default_info():
-        return
+    window_info = get_window_info(window_handle)
     size = event.dict['size']
     new_scale = calculate_new_scale_factor(window_info.size, size)
     scale_container.set_value(new_scale)
@@ -37,7 +35,7 @@ def start_display_window(conversion_queue: Queue, window_handle_container: Windo
 
     pygame.init()
 
-    size = get_window_info_by_handle(window_handle).size
+    size = get_window_info(window_handle).size
     print(f'Initializing pygame window to [{size}]')
 
     pygame_screen = pygame.display.set_mode(size, pygame.RESIZABLE | pygame.DOUBLEBUF | pygame.HWSURFACE)

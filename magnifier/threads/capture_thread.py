@@ -2,7 +2,7 @@ import time
 from queue import Queue
 
 from magnifier.util import Arguments, WindowHandleContainer
-from magnifier.win32 import add_cursor_to_image, capture_image_of_window, get_window_info_by_handle
+from magnifier.win32 import add_cursor_to_image, capture_image_of_window, get_window_info
 
 from .countdown_latch import CountDownLatch
 from .base_thread import BaseThread
@@ -19,7 +19,7 @@ class CaptureThread(BaseThread):
 
     def execute(self):
         try:
-            window_info = get_window_info_by_handle(self._window_handle)
+            window_info = get_window_info(self._window_handle)
             captured_image = capture_image_of_window(self._window_handle, window_info)
 
             if self._arguments.capture_mouse:
