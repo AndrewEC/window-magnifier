@@ -10,7 +10,8 @@ from .base_thread import BaseThread
 
 class CaptureThread(BaseThread):
 
-    def __init__(self, capture_queue: Queue, window_handle_container: WindowHandleContainer, arguments: Arguments, latch: CountDownLatch):
+    def __init__(self, capture_queue: Queue, window_handle_container: WindowHandleContainer, arguments: Arguments,
+                 latch: CountDownLatch):
         super().__init__('CaptureThread', latch)
         self._capture_queue = capture_queue
         self._arguments = arguments
@@ -26,7 +27,8 @@ class CaptureThread(BaseThread):
                 add_cursor_to_image(captured_image, window_info)
 
             self._capture_queue.put(captured_image, True, timeout=0.1)
-        except Exception:
+        except Exception as e:
+            print(str(e))
             time.sleep(0.5)
             self._window_handle = self._window_handle_container.get_value()
         time.sleep(self._arguments.capture_delay_interval)

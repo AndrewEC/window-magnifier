@@ -48,7 +48,7 @@ def _get_window_info_with_decor(hwnd) -> Optional[WindowInfo]:
     return WindowInfo(size, position)
 
 
-def _get_window_info_without_decor(hwnd) -> WindowInfo:
+def _get_window_info_without_decor(hwnd) -> Optional[WindowInfo]:
     if hwnd is None:
         return None
 

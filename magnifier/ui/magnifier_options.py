@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 
-from win32gui import EnumWindows, GetWindowText
+import win32gui
 
 from magnifier.util import Arguments
 from .start_magnifier import start_magnifier
@@ -39,9 +39,10 @@ def _create_select_window_title_section(root):
     window_titles = []
 
     def add_title(hwnd, extra):
-        window_titles.append(GetWindowText(hwnd))
+        if win32gui.IsWindowVisible(hwnd):
+            window_titles.append(win32gui.GetWindowText(hwnd))
 
-    EnumWindows(add_title, None)
+    win32gui.EnumWindows(add_title, None)
 
     window_titles = [title for title in window_titles if title is not None and title.strip() != '']
     window_titles.sort()
