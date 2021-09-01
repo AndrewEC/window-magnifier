@@ -69,7 +69,7 @@ class WindowInfo:
     def __init__(self, size: Tuple[int, int], position: Tuple[int, int], with_decorations: WindowInfo = None):
         self.size = size
         self.position = position
-        self.with_deocrations = with_decorations
+        self.with_decorations = with_decorations
 
     def __eq__(self, other: WindowInfo) -> bool:
         return self.size[0] == other.size[0] and self.size[1] == other.size[1] and self.position[0] == other.position[0] and self.position[1] == self.position[1]

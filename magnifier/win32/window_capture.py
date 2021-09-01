@@ -1,6 +1,7 @@
 from typing import Tuple
 
 from PIL import Image
+from mss import mss
 
 import win32gui
 import win32ui
@@ -10,15 +11,15 @@ from .window_info import WindowInfo
 
 
 def _compute_crop_rect(window_info: WindowInfo) -> Tuple:
-    left = window_info.position[0] - window_info.with_deocrations.position[0]
-    top = window_info.position[1] - window_info.with_deocrations.position[1]
+    left = window_info.position[0] - window_info.with_decorations.position[0]
+    top = window_info.position[1] - window_info.with_decorations.position[1]
     right = left + window_info.size[0]
     bottom = top + window_info.size[1]
     return left, top, right, bottom
 
 
-def capture_image_of_window(hwnd, window_info: WindowInfo) -> Image:
-    size = window_info.with_deocrations.size
+def _capture_painted_window(hwnd, window_info: WindowInfo) -> Image:
+    size = window_info.with_decorations.size
 
     wDC = win32gui.GetWindowDC(hwnd)
     dcObj = win32ui.CreateDCFromHandle(wDC)
@@ -40,3 +41,17 @@ def capture_image_of_window(hwnd, window_info: WindowInfo) -> Image:
     win32gui.DeleteObject(dataBitMap.GetHandle())
 
     return image
+
+
+def _capture_screen_occupied_by_window(hwnd, window_info: WindowInfo) -> Image:
+    box = {'top': window_info.position[1], 'left': window_info.position[0], 'width': window_info.size[0], 'height': window_info.size[1]}
+    with mss() as screen:
+        capture = screen.grab(box)
+        return Image.frombytes('RGB', capture.size, capture.bgra, 'raw', 'BGRX')
+
+
+def capture_image_of_window(screen_capture_mode: bool, hwnd, window_info: WindowInfo) -> Image:
+    if screen_capture_mode:
+        return _capture_screen_occupied_by_window(hwnd, window_info)
+    else:
+        return _capture_painted_window(hwnd, window_info)

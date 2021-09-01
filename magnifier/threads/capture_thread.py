@@ -21,7 +21,8 @@ class CaptureThread(BaseThread):
     def execute(self):
         try:
             window_info = get_window_info(self._window_handle)
-            captured_image = capture_image_of_window(self._window_handle, window_info)
+            captured_image = capture_image_of_window(self._arguments.screen_capture_mode, self._window_handle,
+                                                     window_info)
 
             if self._arguments.capture_mouse:
                 add_cursor_to_image(captured_image, window_info)
