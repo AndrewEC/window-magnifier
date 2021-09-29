@@ -3,6 +3,7 @@ from queue import Queue
 
 from PIL import Image
 import pygame
+from pygame import Surface
 
 from magnifier.util import ScaleContainer, upscale_size_by, Arguments, WindowHandleContainer
 from magnifier.win32 import get_window_info
@@ -39,7 +40,7 @@ class ResizeThread(BaseThread):
         resampling_filter = getattr(Image, self._arguments.resampling_filter)
         return captured_image.resize(upscale_size_by(current_size, scale_factor), resampling_filter)
 
-    def _convert_image_to_surface(self, pil: Image):
+    def _convert_image_to_surface(self, pil: Image) -> Surface:
         return pygame.image.fromstring(pil.tobytes(), pil.size, pil.mode).convert()
 
 
