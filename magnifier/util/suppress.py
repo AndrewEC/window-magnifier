@@ -1,8 +1,11 @@
-from typing import Callable
+from typing import Callable, TypeVar, Optional
 
 
-def invoke_and_suppress(func: Callable):
+T = TypeVar('T')
+
+
+def invoke_and_suppress(func: Callable[[], T]) -> Optional[T]:
     try:
         return func()
-    except Exception:
+    except:
         return None
