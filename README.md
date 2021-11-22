@@ -13,4 +13,4 @@ continuously until the program is closed.
 windows or even hidden off-screen.
 
 ### Running
-This program requires Python 3 to be installed and can be launched using `launch.bat`.
+This program requires Python 3 to be installed and can be launched using `launch.ps1`.

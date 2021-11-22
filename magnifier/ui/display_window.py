@@ -49,8 +49,9 @@ def start_display_window(conversion_queue: Queue, window_handle_container: Windo
             window_handle = get_window_handle(arguments.target_window_title)
             if window_handle is None:
                 pygame.time.delay(500)
-            window_handle_container.set_value(window_handle)
-            invoke_and_suppress(lambda: _update_scale_factor(event, window_handle, scale_container))
+            else:
+                window_handle_container.set_value(window_handle)
+                invoke_and_suppress(lambda: _update_scale_factor(event, window_handle, scale_container))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
