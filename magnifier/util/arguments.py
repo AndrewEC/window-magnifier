@@ -17,7 +17,7 @@ class Arguments:
         self.screen_capture_mode = screen_capture_mode
 
     def __repr__(self):
-        return f'\n\tArguments(' \
+        return f'Window Magnifier Arguments(' \
                f'\n\tTarget Window: [{self.target_window_title}]' \
                f'\n\tCapture Delay Interval: [{self.capture_delay_interval}]' \
                f'\n\tResampling Filter: [{self.resampling_filter}]' \
@@ -25,4 +25,4 @@ class Arguments:
                f'\n\tAlways on Top: [{self.always_on_top}]' \
                f'\n\tRefocus to Target: [{self.refocus_to_target}]' \
                f'\n\tScreen Capture Mode: [{self.screen_capture_mode}]' \
-               f')'
+               f'\n)'
