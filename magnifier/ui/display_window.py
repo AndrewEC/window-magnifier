@@ -42,7 +42,7 @@ def start_display_window(conversion_queue: Queue, window_handle_container: Windo
     pygame.display.set_caption(MAGNIFIER_DISPLAY_WINDOW_NAME)
 
     if arguments.always_on_top:
-        _set_window_to_be_on_top()
+        invoke_and_suppress(_set_window_to_be_on_top)
 
     while True:
         if not win32gui.IsWindow(window_handle):
@@ -67,7 +67,7 @@ def start_display_window(conversion_queue: Queue, window_handle_container: Windo
 
             pygame_screen.fill((0, 0, 0))
             pygame_screen.blit(next_image, _determine_image_rect(next_image.get_rect()))
-        except Exception:
+        except:
             pass
 
         pygame.display.flip()
