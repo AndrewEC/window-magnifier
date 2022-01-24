@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Tuple, Optional
+from typing import Tuple, Optional, Any
 
 import ctypes
 from ctypes import wintypes
@@ -16,7 +16,7 @@ ctypes.windll.user32.SetProcessDPIAware()
 DWMWA_EXTENDED_FRAME_BOUNDS = 9
 
 
-def get_window_handle(window_title: str):
+def get_window_handle(window_title: str) -> Optional[Any]:
     return invoke_and_suppress(lambda: win32gui.FindWindow(None, window_title))
 
 

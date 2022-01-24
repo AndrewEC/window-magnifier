@@ -59,7 +59,7 @@ def _create_select_window_title_section(root):
     return window_title_selector
 
 
-CHECKBOX_DEFINITIONS = [
+_CHECKBOX_DEFINITIONS = [
     (0, 'Capture mouse cursor when cursor is over target window'),
     (0, 'Make magnifier appear on top of other windows'),
     (0, 'Activate target window when magnifier is selected'),
@@ -67,7 +67,7 @@ CHECKBOX_DEFINITIONS = [
 ]
 
 
-def _checkbox_mapper(root) -> Callable[[Tuple[int, str]], tk.StringVar]:
+def _create_check_mapper_function(root) -> Callable[[Tuple[int, str]], tk.StringVar]:
     def _create_checkbox(checkbox_definition: Tuple[int, str]) -> tk.StringVar:
         control = tk.StringVar(value=checkbox_definition[0])
         check = ttk.Checkbutton(root, text=checkbox_definition[1], variable=control)
@@ -97,9 +97,9 @@ def present_magnifier_options():
     delay_level_slider = _create_select_delay_section(root)
     sample_selector = _create_select_resampling_filter(root)
 
-    checkbox_mapper_func = _checkbox_mapper(root)
+    checkbox_mapper_func = _create_check_mapper_function(root)
     capture_cursor_check, always_on_top_check, refocus_to_target_check, screen_capture_check =\
-        list(map(checkbox_mapper_func, CHECKBOX_DEFINITIONS))
+        list(map(checkbox_mapper_func, _CHECKBOX_DEFINITIONS))
 
     def confirm_clicked():
         window_title = window_title_selector.get()
@@ -121,7 +121,3 @@ def present_magnifier_options():
     confirm_button.pack(fill='x', padx=5, pady=5)
 
     root.mainloop()
-
-
-if __name__ == '__main__':
-    present_magnifier_options()

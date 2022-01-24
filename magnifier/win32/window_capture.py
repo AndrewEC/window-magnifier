@@ -43,7 +43,7 @@ def _capture_painted_window(hwnd, window_info: WindowInfo) -> Image:
     return image
 
 
-def _capture_screen_occupied_by_window(hwnd, window_info: WindowInfo) -> Image:
+def _capture_screen_occupied_by_window(window_info: WindowInfo) -> Image:
     box = {'top': window_info.position[1], 'left': window_info.position[0], 'width': window_info.size[0], 'height': window_info.size[1]}
     with mss() as screen:
         capture = screen.grab(box)
@@ -52,6 +52,6 @@ def _capture_screen_occupied_by_window(hwnd, window_info: WindowInfo) -> Image:
 
 def capture_image_of_window(screen_capture_mode: bool, hwnd, window_info: WindowInfo) -> Image:
     if screen_capture_mode:
-        return _capture_screen_occupied_by_window(hwnd, window_info)
+        return _capture_screen_occupied_by_window(window_info)
     else:
         return _capture_painted_window(hwnd, window_info)

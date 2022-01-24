@@ -41,6 +41,7 @@ def _add_border_pixels(source_pixel_position: Tuple[int, int],
                        captured_image: Image,
                        cursor_image: Image):
 
+    # check that the pixel, pulled from the cursor image we are currently inspecting, is fully white in colour.
     if not _is_white_pixel(cursor_image_pixel_data[source_pixel_position[0], source_pixel_position[1]]):
         return
 
@@ -63,16 +64,16 @@ def _iterate_through_cursor_pixels(cursor_position: Tuple[int, int],
                                    cursor_image_pixel_data,
                                    captured_image: Image,
                                    window_info: WindowInfo,
-                                   callback: Callable[[Any, Tuple[int, int], Tuple[int, int]], None]):
+                                   callback: Callable[[Tuple[int, int, int], Tuple[int, int], Tuple[int, int]], None]):
     size = cursor_image.size
-    for source_pixel_x in range(size[0]):
-        for source_pixel_y in range(size[1]):
-            pixel = cursor_image_pixel_data[source_pixel_x, source_pixel_y]
-            x = source_pixel_x + cursor_position[0] - window_info.position[0]
-            y = source_pixel_y + cursor_position[1] - window_info.position[1]
-            if not bounds.is_position_within_image_bounds(x, y, captured_image):
+    for cursor_image_pixel_x in range(size[0]):
+        for cursor_image_pixel_y in range(size[1]):
+            pixel = cursor_image_pixel_data[cursor_image_pixel_x, cursor_image_pixel_y]
+            mouse_relative_to_image_x = cursor_image_pixel_x + cursor_position[0] - window_info.position[0]
+            mouse_relative_to_image_y = cursor_image_pixel_y + cursor_position[1] - window_info.position[1]
+            if not bounds.is_position_within_image_bounds(mouse_relative_to_image_x, mouse_relative_to_image_y, captured_image):
                 return
-            callback(pixel, (source_pixel_x, source_pixel_y), (x, y))
+            callback(pixel, (cursor_image_pixel_x, cursor_image_pixel_y), (mouse_relative_to_image_x, mouse_relative_to_image_y))
 
 
 def _paste_cursor_on_image(cursor_position: Tuple[int, int],
@@ -82,17 +83,17 @@ def _paste_cursor_on_image(cursor_position: Tuple[int, int],
 
     cursor_image_pixel_data = cursor_image.load()
 
-    def paste_white_pixels(pixel, source_pixel_position: Tuple[int, int], destination_pixel_position: Tuple[int, int]):
+    def paste_white_pixel(pixel: Tuple[int, int, int], source_pixel_position: Tuple[int, int], destination_pixel_position: Tuple[int, int]):
         if not _is_white_pixel(pixel):
             return
         captured_image.putpixel(destination_pixel_position, (_COLOUR_WHITE,) * _COLOURS_PER_PIXEL)
 
-    def add_black_border(pixel, source_pixel_position: Tuple[int, int], destination_pixel_position: Tuple[int, int]):
+    def add_black_border_around_pixel(pixel, source_pixel_position: Tuple[int, int], destination_pixel_position: Tuple[int, int]):
         _add_border_pixels(source_pixel_position, destination_pixel_position, cursor_image_pixel_data, captured_image,
                            cursor_image)
 
-    _iterate_through_cursor_pixels(cursor_position, cursor_image, cursor_image_pixel_data, captured_image, window_info, paste_white_pixels)
-    _iterate_through_cursor_pixels(cursor_position, cursor_image, cursor_image_pixel_data, captured_image, window_info, add_black_border)
+    _iterate_through_cursor_pixels(cursor_position, cursor_image, cursor_image_pixel_data, captured_image, window_info, paste_white_pixel)
+    _iterate_through_cursor_pixels(cursor_position, cursor_image, cursor_image_pixel_data, captured_image, window_info, add_black_border_around_pixel)
 
 
 def add_cursor_to_image(captured_image: Image, window_info: WindowInfo):
