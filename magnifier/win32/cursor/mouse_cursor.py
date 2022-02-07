@@ -1,4 +1,4 @@
-from typing import Tuple, Callable, Any
+from typing import Tuple, Callable
 
 import win32gui
 from PIL import Image
@@ -35,6 +35,11 @@ def _add_tuples(first: Tuple[int, int], second: Tuple[int, int]) -> Tuple[int, i
     return first[0] + second[0], first[1] + second[1]
 
 
+def _is_pixel_from_cursor_image_white(pixel_position: Tuple[int, int], cursor_image: Image, cursor_image_pixel_data) -> bool:
+    return bounds.is_position_within_image_bounds(*pixel_position, cursor_image) \
+           and _is_white_pixel(cursor_image_pixel_data[pixel_position[0], pixel_position[1]])
+
+
 def _add_border_pixels(source_pixel_position: Tuple[int, int],
                        destination_pixel_position: Tuple[int, int],
                        cursor_image_pixel_data,
@@ -52,8 +57,7 @@ def _add_border_pixels(source_pixel_position: Tuple[int, int],
             continue
 
         adjacent_source_position = _add_tuples(source_pixel_position, adjacent_modifier)
-        if bounds.is_position_within_image_bounds(*adjacent_source_position, cursor_image)\
-                and _is_white_pixel(cursor_image_pixel_data[adjacent_source_position[0], adjacent_source_position[1]]):
+        if _is_pixel_from_cursor_image_white(adjacent_source_position, cursor_image, cursor_image_pixel_data):
             continue
 
         captured_image.putpixel(adjacent_destination_position, (_COLOUR_BLACK,) * _COLOURS_PER_PIXEL)
@@ -88,7 +92,7 @@ def _paste_cursor_on_image(cursor_position: Tuple[int, int],
             return
         captured_image.putpixel(destination_pixel_position, (_COLOUR_WHITE,) * _COLOURS_PER_PIXEL)
 
-    def add_black_border_around_pixel(pixel, source_pixel_position: Tuple[int, int], destination_pixel_position: Tuple[int, int]):
+    def add_black_border_around_pixel(pixel: Tuple[int, int, int], source_pixel_position: Tuple[int, int], destination_pixel_position: Tuple[int, int]):
         _add_border_pixels(source_pixel_position, destination_pixel_position, cursor_image_pixel_data, captured_image,
                            cursor_image)
 
@@ -102,8 +106,9 @@ def add_cursor_to_image(captured_image: Image, window_info: WindowInfo):
     if flags == _MOUSE_HIDDEN_FLAG:
         return
 
-    if not bounds.is_mouse_over_target_application(cursor_position, window_info):
+    cursor_image = capture.get_cursor_image(hcursor)
+
+    if not bounds.is_mouse_over_target_application(cursor_position, cursor_image.size, window_info):
         return
 
-    cursor_image = capture.get_cursor_image(hcursor)
     _paste_cursor_on_image(cursor_position, cursor_image, captured_image, window_info)
