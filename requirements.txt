@@ -1,4 +1,4 @@
-pygame==2.0.1
-Pillow==8.1.2
-pywin32==301
+pygame==2.1.2
+Pillow==9.0.1
+pywin32==303
 mss==6.1.0
