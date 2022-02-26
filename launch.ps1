@@ -1,15 +1,19 @@
-$pythonCommand = "python"
-$pipCommand = "pip"
+$PythonCommand = "python"
+$PipCommand = "pip"
+$VenvLocation = "window-magnifier-venv"
 
-if (-Not(Get-Command $pythonCommand -errorAction SilentlyContinue)) {
-    $pythonCommand = "python3"
+if (-Not(Get-Command $PythonCommand -errorAction SilentlyContinue)) {
+    $PythonCommand = "python3"
 }
 
-if (-Not(Get-Command $pipCommand -errorAction SilentlyContinue)) {
-    $pipCommand = "pip3"
+if (-Not(Get-Command $PipCommand -errorAction SilentlyContinue)) {
+    $PipCommand = "pip3"
 }
 
-Invoke-Expression "$pythonCommand -m venv window-magnifier-env"`
-    && Invoke-Expression "./window-magnifier-env/Scripts/Activate.ps1"`
-    && Invoke-Expression "$pipCommand install -r requirements.txt"`
-    && Invoke-Expression "$pythonCommand -m magnifier.start"
+if (-Not(Test-Path $VenvLocation)) {
+    Invoke-Expression "$PythonCommand -m venv $VenvLocation"`
+}
+
+Invoke-Expression "./$VenvLocation/Scripts/Activate.ps1"`
+    && Invoke-Expression "$PipCommand install -r requirements.txt"`
+    && Invoke-Expression "$PythonCommand -m magnifier.start"
