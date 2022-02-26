@@ -24,7 +24,7 @@ class ResizeThread(BaseThread):
         self._window_handle = window_handle_container.get_value()
         self._window_handle_container = window_handle_container
 
-    def execute(self):
+    def _execute(self):
         try:
             capture_data = self._capture_queue.get(True, 0.3)
             image = self._upscale_image(capture_data)

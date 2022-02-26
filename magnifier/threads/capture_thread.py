@@ -18,7 +18,7 @@ class CaptureThread(BaseThread):
         self._window_handle = window_handle_container.get_value()
         self._window_handle_container = window_handle_container
 
-    def execute(self):
+    def _execute(self):
         try:
             window_info = get_window_info(self._window_handle)
             captured_image = capture_image_of_window(self._arguments.screen_capture_mode, self._window_handle,

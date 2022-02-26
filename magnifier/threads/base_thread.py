@@ -15,12 +15,12 @@ class BaseThread(Thread):
     def run(self):
         print(f'Starting thread: [{self._name}]')
         while not self._stop_event.is_set():
-            self.execute()
+            self._execute()
         print(f'Stopping thread: [{self._name}]')
         self._latch.count_down()
 
     @abstractmethod
-    def execute(self):
+    def _execute(self):
         pass
 
     def request_stop(self):
