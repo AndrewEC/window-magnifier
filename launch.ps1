@@ -1,6 +1,7 @@
 $PythonCommand = "python"
 $PipCommand = "pip"
-$VenvLocation = "window-magnifier-venv"
+$CurrentFolder = Get-Location | Split-Path -Leaf
+$VenvLocation = "$CurrentFolder-venv"
 
 if (-Not(Get-Command $PythonCommand -errorAction SilentlyContinue)) {
     $PythonCommand = "python3"
