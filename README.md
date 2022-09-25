@@ -1,13 +1,14 @@
 Window Magnifier
 ---
 
-A command line utility for magnifying a single application. This works by:
+A utility to scale a single application window without magnifying the entire desktop.
+
+![Window Magnifier - Main Window](window-magnifier.png)
+
+This utility works by:
 1. Capturing the visible content of the target application that we want to magnify as an image
 2. Scaling the image to fit within the bounds of the magnifier display window
 3. And finally displaying the scaled image in the magnifier display window
-
-This application doesn't just take a single screenshot and upscale it. It will perform the above actions
-continuously until the program is closed.
 
 ### Running
 The application can be executed using two methods.
