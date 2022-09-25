@@ -6,7 +6,8 @@ import win32gui
 import pygame
 from pygame.event import Event
 
-from magnifier.util import ScaleContainer, calculate_new_scale_factor, MAGNIFIER_DISPLAY_WINDOW_NAME, Arguments, invoke_and_suppress, WindowHandleContainer
+from magnifier.util import ScaleContainer, calculate_new_scale_factor, MAGNIFIER_DISPLAY_WINDOW_NAME, Arguments,\
+    invoke_and_suppress, WindowHandleContainer, get_icon_path
 from magnifier.win32 import get_window_info, get_window_handle
 
 
@@ -33,6 +34,9 @@ def start_display_window(conversion_queue: Queue, window_handle_container: Windo
                          scale_container: ScaleContainer, arguments: Arguments, on_exit: Callable):
     window_handle = window_handle_container.get_value()
 
+    icon_path = get_icon_path()
+    if icon_path is not None:
+        pygame.display.set_icon(pygame.image.load(icon_path))
     pygame.init()
 
     size = get_window_info(window_handle).size

@@ -9,8 +9,15 @@ A command line utility for magnifying a single application. This works by:
 This application doesn't just take a single screenshot and upscale it. It will perform the above actions
 continuously until the program is closed.
 
-**Important**: The application to be magnified cannot be minimized. Otherwise the application can be hidden behind other
-windows or even hidden off-screen.
-
 ### Running
-This program requires Python 3 to be installed and can be launched using `launch.ps1`.
+The application can be executed using two methods.
+
+For both methods you should first run the `CreateVenv.ps1` script to create a new virtual environment and install the
+necessary dependencies.
+
+Once the script is complete the application can be run directly through the terminal using a command like:
+`python -m magnifier.start`
+
+Or, if you prefer, you can package the application into an executable by running the `Package.ps1` script.
+After running the package script you can find the application in the `dist` directory under the path
+`dist/window-magnifier/window-magnifier.exe`

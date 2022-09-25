@@ -2,3 +2,6 @@ __pycache__
 *.pyc
 .idea
 window-magnifier-venv
+window-magnifier.spec
+build
+dist

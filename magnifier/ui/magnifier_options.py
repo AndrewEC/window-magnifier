@@ -5,7 +5,7 @@ from tkinter import ttk
 
 import win32gui
 
-from magnifier.util import Arguments
+from magnifier.util import Arguments, get_icon_path
 from .start_magnifier import start_magnifier
 
 
@@ -31,7 +31,8 @@ def _create_select_resampling_filter(root):
     select_resampling_filter_label.pack(fill='x', padx=5, pady=5)
 
     resampling_filter_selector = ttk.Combobox(root)
-    resampling_filter_selector['values'] = ['NEAREST (Quickest Lowest Quality)', 'BOX', 'BILINEAR', 'HAMMING', 'BICUBIC (Slower, Higher Quality)', 'LANCZOS (Slowest, Highest Quality)']
+    resampling_filter_selector['values'] = ['NEAREST (Quickest Lowest Quality)', 'BOX', 'BILINEAR (DEFAULT)', 'HAMMING', 'BICUBIC', 'LANCZOS (Slowest, Highest Quality)']
+    resampling_filter_selector.current(2)
     resampling_filter_selector.pack(fill='x', padx=5, pady=5)
 
     return resampling_filter_selector
@@ -69,7 +70,7 @@ _CHECKBOX_DEFINITIONS = [
 
 def _create_check_mapper_function(root) -> Callable[[Tuple[int, str]], tk.StringVar]:
     def _create_checkbox(checkbox_definition: Tuple[int, str]) -> tk.StringVar:
-        control = tk.StringVar(value=checkbox_definition[0])
+        control = tk.StringVar(value=str(checkbox_definition[0]))
         check = ttk.Checkbutton(root, text=checkbox_definition[1], variable=control)
         check.pack(fill='x', padx=5, pady=5)
         return control
@@ -89,6 +90,9 @@ def _parse_resampling_filter_option(sampler_option: str) -> str:
 
 def present_magnifier_options():
     root = tk.Tk()
+    icon_path = get_icon_path()
+    if icon_path is not None:
+        root.iconphoto(False, tk.PhotoImage(file=icon_path))
     root.geometry('470x350')
     root.resizable(False, False)
     root.title('Window Magnifier Options')
