@@ -10,3 +10,4 @@ if (-Not(Get-Command $PipCommand -errorAction SilentlyContinue)) {
 
 Invoke-Expression "$PipCommand install pyinstaller"
 Invoke-Expression "pyinstaller ./magnifier/start.py --windowed --icon=./magnifier/resources/icon.png --name=window-magnifier"
+Copy-Item ./magnifier/resources -Destination ./dist/window-magnifier -Recurse
