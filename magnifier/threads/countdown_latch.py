@@ -11,7 +11,7 @@ class CountDownLatch:
         with self._condition:
             self._count = self._count - 1
             if self._count == 0:
-                self._condition.notifyAll()
+                self._condition.notify_all()
 
     def await_countdown(self):
         with self._condition:

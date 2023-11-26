@@ -22,3 +22,9 @@ Once the script is complete the application can be run directly through the term
 Or, if you prefer, you can package the application into an executable by running the `Package.ps1` script.
 After running the package script you can find the application in the `dist` directory under the path
 `dist/window-magnifier/window-magnifier.exe`
+
+### 3rd Party Libraries
+* [pygame](https://github.com/pygame/pygame) - Rendering the resized screen captures.
+* [Pillow](https://github.com/python-pillow/Pillow) - Manipulating and resizing the screen capture images.
+* [pywin32](https://github.com/mhammond/pywin32) - Invoking native window functions.
+* [mss](https://github.com/BoboTiG/python-mss) - Taking screenshots of part of the visible screen.

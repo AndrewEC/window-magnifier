@@ -61,7 +61,7 @@ def _create_select_window_title_section(root):
 
 
 _CHECKBOX_DEFINITIONS = [
-    (0, 'Capture mouse cursor when cursor is over target window'),
+    (1, 'Capture mouse cursor when cursor is over target window'),
     (0, 'Make magnifier appear on top of other windows'),
     (0, 'Activate target window when magnifier is selected'),
     (0, 'Use screen capture mode (needed to properly magnify OpenGL and DirectX apps)')
